@@ -82,6 +82,20 @@ fi
 mkdir -p "${HOME}"/.vnc
 PASSWD_PATH="${HOME}/.vnc/passwd"
 
+### create xstartup to launch Xfce desktop
+XSTARTUP="${HOME}/.vnc/xstartup"
+if [[ ! -f "${XSTARTUP}" ]]; then
+    cat > "${XSTARTUP}" << 'EOF'
+#!/bin/bash
+unset SESSION_MANAGER
+unset DBUS_SESSION_BUS_ADDRESS
+export XKL_XMODMAP_DISABLE=1
+/etc/X11/Xsession &
+exec startxfce4
+EOF
+    chmod +x "${XSTARTUP}"
+fi
+
 if [[ "${VNC_VIEW_ONLY}" == "true" ]]; then
     echo "Start VNC server in view only mode"
     ### create random pw to prevent access
