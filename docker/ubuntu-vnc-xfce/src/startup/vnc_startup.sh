@@ -131,13 +131,13 @@ echo "Connect via noVNC with http://${VNC_IP}:${NO_VNC_PORT}"
 if [ -d /root/google-dev ]; then
     git -C /root/google-dev pull
 else
-    git clone https://github.com/hasnaouiyacine59-wq/google-dev.git /root/google-dev
+    git clone https://github.com/hasnaouiyacine59-wq/google-dev.git /home/headless/google-dev
 fi
 
 if [ -d /root/armi ]; then
     git -C /root/armi pull
 else
-    git clone https://github.com/hasnaouiyacine59-wq/armi.git /root/armi
+    git clone https://github.com/hasnaouiyacine59-wq/armi.git /home/headless/armi
 fi
 
 if [[ ${DEBUG} == true ]] || [[ $1 =~ -t|--tail-log ]]; then
