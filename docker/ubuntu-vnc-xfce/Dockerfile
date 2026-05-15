@@ -192,7 +192,7 @@ COPY requirements.txt .
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip \
     && rm -rf /var/lib/apt/lists/* \
-    && pip3 install --no-cache-dir -r requirements.txt
+    && pip3 install --no-cache-dir -r requirements.txt \
     && playwright install chromium --with-deps
 RUN python3 -m camoufox fetch
 ### Preconfigure Xfce
