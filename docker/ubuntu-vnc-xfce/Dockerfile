@@ -209,19 +209,22 @@ ENV \
 WORKDIR ${HOME}
 
 COPY [ "./src/startup", "${STARTUPDIR}/" ]
+COPY requirements.txt /tmp/requirements.txt
 
-### Copy Python packages from build stage
-COPY --from=stage-python /usr/local/lib/python3.8 /usr/local/lib/python3.8
-
-### Runtime libs needed by opencv and camoufox (no build tools)
+### Install Python runtime + all deps in one layer
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
         python3 \
+        python3-pip \
         libgl1 \
         libglib2.0-0 \
-    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
-    && python3 -m camoufox fetch
+    && pip3 install --no-cache-dir -r /tmp/requirements.txt \
+    && python3 -m camoufox fetch \
+    && pip3 uninstall -y pip \
+    && rm /tmp/requirements.txt \
+    && find /usr/local/lib/python3* \( -name "*.pyc" -o -name "*.pyo" \) -delete \
+    && find /usr/local/lib/python3* -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 ### Preconfigure Xfce
 COPY [ "./src/home/Desktop", "./Desktop/" ]
 COPY [ "./src/home/config/xfce4/panel", "./.config/xfce4/panel/" ]
