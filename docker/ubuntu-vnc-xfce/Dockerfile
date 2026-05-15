@@ -167,11 +167,11 @@ RUN apt-get update \
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt \
-    && python3 -m camoufox fetch \
     && find /usr/local/lib/python3* \( -name "*.pyc" -o -name "*.pyo" \) -delete \
     && find /usr/local/lib/python3* -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null; \
        find /usr/local/lib/python3* -name "tests" -type d -exec rm -rf {} + 2>/dev/null; \
-       find /usr/local/lib/python3* -name "test" -type d -exec rm -rf {} + 2>/dev/null; true
+       find /usr/local/lib/python3* -name "test" -type d -exec rm -rf {} + 2>/dev/null; true \
+    && python3 -c "import camoufox; import os; print(os.path.dirname(camoufox.__file__))" > /tmp/camoufox_path.txt
 
 FROM stage-wrapper as stage-final
 
@@ -210,9 +210,8 @@ WORKDIR ${HOME}
 
 COPY [ "./src/startup", "${STARTUPDIR}/" ]
 
-### Copy Python packages and camoufox browser from build stage
+### Copy Python packages from build stage
 COPY --from=stage-python /usr/local/lib/python3.8 /usr/local/lib/python3.8
-COPY --from=stage-python /root/.local/share/camoufox /root/.local/share/camoufox
 
 ### Runtime libs needed by opencv and camoufox (no build tools)
 RUN apt-get update \
@@ -221,7 +220,8 @@ RUN apt-get update \
         libgl1 \
         libglib2.0-0 \
     && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -m camoufox fetch
 ### Preconfigure Xfce
 COPY [ "./src/home/Desktop", "./Desktop/" ]
 COPY [ "./src/home/config/xfce4/panel", "./.config/xfce4/panel/" ]
