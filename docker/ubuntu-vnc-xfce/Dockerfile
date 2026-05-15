@@ -188,7 +188,9 @@ ENV \
 WORKDIR ${HOME}
 
 COPY [ "./src/startup", "${STARTUPDIR}/" ]
-
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m camoufox fetch
 ### Preconfigure Xfce
 COPY [ "./src/home/Desktop", "./Desktop/" ]
 COPY [ "./src/home/config/xfce4/panel", "./.config/xfce4/panel/" ]

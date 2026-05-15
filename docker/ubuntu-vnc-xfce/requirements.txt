@@ -1,0 +1,10 @@
+requests
+faker
+camoufox
+opencv-python
+numpy
+psutil
+SpeechRecognition
+camoufox[geoip]
+pyhub
+SpeechRecognition
