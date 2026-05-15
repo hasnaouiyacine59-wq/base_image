@@ -1,10 +1,8 @@
 requests
 faker
-camoufox
-opencv-python
+camoufox[geoip]
+opencv-python-headless
 numpy
 psutil
 SpeechRecognition
-camoufox[geoip]
 pyhub
-SpeechRecognition

@@ -16,8 +16,8 @@
 ### If '+ exit 1' then adjust the version sticker
 ### variables in script './hooks/env'
 
-ARG BASETAG=18.04
-ARG PYTHON_NUMPY_PKG=python-numpy
+ARG BASETAG=20.04
+ARG PYTHON_NUMPY_PKG=python3-numpy
 
 FROM ubuntu:${BASETAG} as stage-ubuntu
 
@@ -111,7 +111,7 @@ FROM stage-vnc as stage-novnc
 ENV NO_VNC_HOME=/usr/share/usr/local/share/noVNCdim
 
 ### ARG must be re-declared inside each stage to be accessible
-ARG PYTHON_NUMPY_PKG=python-numpy
+ARG PYTHON_NUMPY_PKG=python3-numpy
 
 ### 'apt-get clean' runs automatically
 ### 'python-numpy' used for websockify/novnc
@@ -125,6 +125,7 @@ RUN apt-get update \
     && wget -qO- "https://github.com/novnc/noVNC/archive/v1.3.0.tar.gz" | tar xz --strip 1 -C "${NO_VNC_HOME}" \
     && wget -qO- "https://github.com/novnc/websockify/archive/v0.11.0.tar.gz" | tar xz --strip 1 -C "${NO_VNC_HOME}/utils/websockify" \
     && chmod +x -v "${NO_VNC_HOME}/utils/novnc_proxy" \
+    && rm -rf "${NO_VNC_HOME}/tests" "${NO_VNC_HOME}/utils/websockify/tests" \
     && rm -rf /var/lib/apt/lists/*
 
 ### add 'index.html' for choosing noVNC client
@@ -151,6 +152,26 @@ RUN apt-get update \
         gettext \
         libnss-wrapper \
     && rm -rf /var/lib/apt/lists/*
+
+### Python build stage — branches from lean stage-ubuntu, NOT the full VNC stack
+FROM stage-ubuntu as stage-python
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        python3-pip \
+        python3-dev \
+        gcc \
+        libgl1 \
+        libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt \
+    && python3 -m camoufox fetch \
+    && find /usr/local/lib/python3* \( -name "*.pyc" -o -name "*.pyo" \) -delete \
+    && find /usr/local/lib/python3* -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null; \
+       find /usr/local/lib/python3* -name "tests" -type d -exec rm -rf {} + 2>/dev/null; \
+       find /usr/local/lib/python3* -name "test" -type d -exec rm -rf {} + 2>/dev/null; true
 
 FROM stage-wrapper as stage-final
 
@@ -188,13 +209,19 @@ ENV \
 WORKDIR ${HOME}
 
 COPY [ "./src/startup", "${STARTUPDIR}/" ]
-COPY requirements.txt .
+
+### Copy Python packages and camoufox browser from build stage
+COPY --from=stage-python /usr/local/lib/python3.8 /usr/local/lib/python3.8
+COPY --from=stage-python /root/.local/share/camoufox /root/.local/share/camoufox
+
+### Runtime libs needed by opencv and camoufox (no build tools)
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip \
-    && rm -rf /var/lib/apt/lists/* \
-    && pip3 install --no-cache-dir -r requirements.txt \
-    && playwright install chromium --with-deps
-RUN python3 -m camoufox fetch
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        python3 \
+        libgl1 \
+        libglib2.0-0 \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 ### Preconfigure Xfce
 COPY [ "./src/home/Desktop", "./Desktop/" ]
 COPY [ "./src/home/config/xfce4/panel", "./.config/xfce4/panel/" ]
