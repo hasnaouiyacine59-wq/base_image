@@ -90,6 +90,9 @@ if [[ ! -f "${XSTARTUP}" ]]; then
 unset SESSION_MANAGER
 unset DBUS_SESSION_BUS_ADDRESS
 export XKL_XMODMAP_DISABLE=1
+xset s off
+xset s noblank
+xset -dpms
 /etc/X11/Xsession &
 exec startxfce4
 EOF
