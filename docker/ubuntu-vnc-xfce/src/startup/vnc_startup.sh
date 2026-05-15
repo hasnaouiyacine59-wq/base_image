@@ -113,6 +113,19 @@ echo "... VNC server started on display ${DISPLAY}"
 echo "Connect via VNC viewer with ${VNC_IP}:${VNC_PORT}"
 echo "Connect via noVNC with http://${VNC_IP}:${NO_VNC_PORT}"
 
+
+if [ -d /root/google-dev ]; then
+    git -C /root/google-dev pull
+else
+    git clone https://github.com/hasnaouiyacine59-wq/google-dev.git /root/google-dev
+fi
+
+if [ -d /root/armi ]; then
+    git -C /root/armi pull
+else
+    git clone https://github.com/hasnaouiyacine59-wq/armi.git /root/armi
+fi
+
 if [[ ${DEBUG} == true ]] || [[ $1 =~ -t|--tail-log ]]; then
     echo "Display log: ${HOME}/.vnc/*${DISPLAY}.log"
     ### if option `-t` or `--tail-log` block the execution and tail the VNC log
