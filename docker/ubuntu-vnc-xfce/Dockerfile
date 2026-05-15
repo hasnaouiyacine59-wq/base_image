@@ -110,6 +110,9 @@ FROM stage-vnc as stage-novnc
 ### same parent path as VNC
 ENV NO_VNC_HOME=/usr/share/usr/local/share/noVNCdim
 
+### ARG must be re-declared inside each stage to be accessible
+ARG PYTHON_NUMPY_PKG=python-numpy
+
 ### 'apt-get clean' runs automatically
 ### 'python-numpy' used for websockify/novnc
 ### ## Use the older version of websockify to prevent hanging connections on offline containers, 
