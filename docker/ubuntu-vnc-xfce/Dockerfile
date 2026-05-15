@@ -17,6 +17,7 @@
 ### variables in script './hooks/env'
 
 ARG BASETAG=18.04
+ARG PYTHON_NUMPY_PKG=python-numpy
 
 FROM ubuntu:${BASETAG} as stage-ubuntu
 
@@ -116,7 +117,7 @@ ENV NO_VNC_HOME=/usr/share/usr/local/share/noVNCdim
 ### installed into '/usr/share/usr/local/share/noVNCdim'
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        python-numpy \
+        ${PYTHON_NUMPY_PKG} \
     && mkdir -p "${NO_VNC_HOME}/utils/websockify" \
     && wget -qO- "https://github.com/novnc/noVNC/archive/v1.3.0.tar.gz" | tar xz --strip 1 -C "${NO_VNC_HOME}" \
     && wget -qO- "https://github.com/novnc/websockify/archive/v0.11.0.tar.gz" | tar xz --strip 1 -C "${NO_VNC_HOME}/utils/websockify" \

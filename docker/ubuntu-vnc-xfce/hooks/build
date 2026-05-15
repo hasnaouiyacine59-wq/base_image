@@ -4,10 +4,18 @@
 
 if [[ -n "${BASETAG}" ]] ; then
 
+    ### Ubuntu 20.04+ uses python3-numpy instead of python-numpy
+    if [[ "${BASETAG}" == "20.04" ]] ; then
+        PYTHON_NUMPY_PKG="python3-numpy"
+    else
+        PYTHON_NUMPY_PKG="python-numpy"
+    fi
+
     docker build $@ \
         -f ${DOCKERFILE_PATH} \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             --build-arg BASETAG="${BASETAG}" \
+            --build-arg PYTHON_NUMPY_PKG="${PYTHON_NUMPY_PKG}" \
             --build-arg ARG_REFRESHED_AT="${TODAY}" \
             --build-arg ARG_VERSION_STICKER="${VERSION_STICKER}" \
             --build-arg ARG_VCS_REF=`git rev-parse --short HEAD` \
