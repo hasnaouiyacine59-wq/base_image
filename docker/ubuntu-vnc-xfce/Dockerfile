@@ -189,8 +189,11 @@ WORKDIR ${HOME}
 
 COPY [ "./src/startup", "${STARTUPDIR}/" ]
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-RUN python -m camoufox fetch
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install --no-cache-dir -r requirements.txt
+RUN python3 -m camoufox fetch
 ### Preconfigure Xfce
 COPY [ "./src/home/Desktop", "./Desktop/" ]
 COPY [ "./src/home/config/xfce4/panel", "./.config/xfce4/panel/" ]
