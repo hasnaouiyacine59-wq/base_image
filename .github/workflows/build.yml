@@ -34,5 +34,6 @@ jobs:
             PYTHON_NUMPY_PKG=python3-numpy
             ARG_REFRESHED_AT=${{ github.event.head_commit.timestamp }}
             ARG_VCS_REF=${{ github.sha }}
+            ARG_VERSION_STICKER=ubuntu20.04
           cache-from: type=gha
           cache-to: type=gha,mode=max

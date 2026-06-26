@@ -101,11 +101,11 @@ fi
 
 if [[ "${VNC_VIEW_ONLY}" == "true" ]]; then
     echo "Start VNC server in view only mode"
-    ### create random pw to prevent access
-    echo $(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20) | vncpasswd -f > "${PASSWD_PATH}"
+    head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20 | vncpasswd -f > "${PASSWD_PATH}"
+    printf '%s\n' "${VNC_PW}" | vncpasswd -f >> "${PASSWD_PATH}"
+else
+    printf '%s\n' "${VNC_PW}" | vncpasswd -f > "${PASSWD_PATH}"
 fi
-
-echo "${VNC_PW}" | vncpasswd -f >> "${PASSWD_PATH}"
 chmod 600 "${PASSWD_PATH}"
 
 ### start vncserver and noVNC webclient in the background
@@ -123,7 +123,7 @@ echo "... VNC params: VNC_COL_DEPTH=${VNC_COL_DEPTH}, VNC_RESOLUTION=${VNC_RESOL
 echo "... VNC params: VNC_BLACKLIST_TIMEOUT=${VNC_BLACKLIST_TIMEOUT}, VNC_BLACKLIST_THRESHOLD=${VNC_BLACKLIST_THRESHOLD}"
 vncserver ${DISPLAY} -depth ${VNC_COL_DEPTH} -geometry ${VNC_RESOLUTION} \
     -BlacklistTimeout ${VNC_BLACKLIST_TIMEOUT} \
-    -BlacklistThreshold ${VNC_BLACKLIST_THRESHOLD} &> "${STARTUPDIR}"/no_vnc_startup.log
+    -BlacklistThreshold ${VNC_BLACKLIST_THRESHOLD} &> "${STARTUPDIR}"/vnc_startup.log
 
 ### log connect options
 echo "... VNC server started on display ${DISPLAY}"
@@ -131,14 +131,14 @@ echo "Connect via VNC viewer with ${VNC_IP}:${VNC_PORT}"
 echo "Connect via noVNC with http://${VNC_IP}:${NO_VNC_PORT}"
 
 
-if [ -d /root/google-dev ]; then
-    git -C /root/google-dev pull
+if [ -d /home/headless/google-dev ]; then
+    git -C /home/headless/google-dev pull
 else
     git clone https://github.com/hasnaouiyacine59-wq/google-dev.git /home/headless/google-dev
 fi
 
-if [ -d /root/armi ]; then
-    git -C /root/armi pull
+if [ -d /home/headless/armi ]; then
+    git -C /home/headless/armi pull
 else
     git clone https://github.com/hasnaouiyacine59-wq/armi.git /home/headless/armi
 fi

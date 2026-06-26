@@ -153,26 +153,6 @@ RUN apt-get update \
         libnss-wrapper \
     && rm -rf /var/lib/apt/lists/*
 
-### Python build stage — branches from lean stage-ubuntu, NOT the full VNC stack
-FROM stage-ubuntu as stage-python
-
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        python3-pip \
-        python3-dev \
-        gcc \
-        libgl1 \
-        libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt /tmp/requirements.txt
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt \
-    && find /usr/local/lib/python3* \( -name "*.pyc" -o -name "*.pyo" \) -delete \
-    && find /usr/local/lib/python3* -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null; \
-       find /usr/local/lib/python3* -name "tests" -type d -exec rm -rf {} + 2>/dev/null; \
-       find /usr/local/lib/python3* -name "test" -type d -exec rm -rf {} + 2>/dev/null; true \
-    && python3 -c "import camoufox; import os; print(os.path.dirname(camoufox.__file__))" > /tmp/camoufox_path.txt
-
 FROM stage-wrapper as stage-final
 
 LABEL \
