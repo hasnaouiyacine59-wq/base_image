@@ -34,6 +34,13 @@ RUN apt-get update \
 ### Note that 'no-sandbox' flag is required, but intended for development only
 RUN echo "CHROMIUM_FLAGS='--no-sandbox --disable-gpu --user-data-dir --window-size=${VNC_RESOLUTION%x*},${VNC_RESOLUTION#*x} --window-position=0,0'" > ${HOME}/.chromium-browser.init
 
+### Install NordVPN
+RUN wget -qO - https://downloads.nordcdn.com/apps/linux/install.sh | bash \
+    && rm -rf /var/lib/apt/lists/*
+
+### Pre-create TUN device node directory
+RUN mkdir -p /dev/net
+
 FROM stage-install as stage-config
 
 ### Arguments can be provided during build
@@ -83,14 +90,19 @@ COPY [ "./src/home/Desktop", "./Desktop/" ]
 COPY [ "./src/home/config/xfce4/panel", "./.config/xfce4/panel/" ]
 COPY [ "./src/home/config/xfce4/xfconf/xfce-perchannel-xml", "./.config/xfce4/xfconf/xfce-perchannel-xml/" ]
 COPY [ "./src/startup/version_sticker.sh", "${STARTUPDIR}/" ]
+COPY [ "./src/startup/nordvpn_init.sh", "${STARTUPDIR}/" ]
 
 ### Fix permissions
 RUN \
     chmod a+wx "${STARTUPDIR}"/version_sticker.sh \
+    "${STARTUPDIR}"/nordvpn_init.sh \
     && "${STARTUPDIR}"/set_user_permissions.sh "${STARTUPDIR}" "${HOME}"
 
-### Switch to non-root user
-USER ${VNC_USER}
+### Auto-init NordVPN on container start
+RUN echo 'source $STARTUPDIR/nordvpn_init.sh' >> ${HOME}/.bashrc
+
+### Keep root user for NordVPN network capabilities
+# USER ${VNC_USER}
 
 ### Issue #7 (base): Mitigating problems with foreground mode
 WORKDIR ${STARTUPDIR}
