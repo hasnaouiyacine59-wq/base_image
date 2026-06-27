@@ -17,10 +17,18 @@ VERSION_STICKER_LATEST="${G1_STICKER_BASE:-ubuntu18.04.6}-${G1_STICKER_CHROMIUM:
 
 VERSION_STICKER="${VERSION_STICKER_LATEST}"
 
+VERSION_STICKER_FOCAL="${G1_STICKER_BASE:-ubuntu20.04}-${G1_STICKER_CHROMIUM:-chromium}"
+
 case "${DOCKER_TAG}" in
 
     latest | dev )
         BASETAG="${DOCKER_TAG}"
+        VERSION_STICKER="${VERSION_STICKER_LATEST}"
+        ;;
+
+    focal | 20.04 )
+        BASETAG="focal"
+        VERSION_STICKER="${VERSION_STICKER_FOCAL}"
         ;;
 
     *)
