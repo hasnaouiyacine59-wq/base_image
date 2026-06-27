@@ -23,14 +23,14 @@ FROM accetto/ubuntu-vnc-xfce:${BASETAG} as stage-install
 ### Be sure to use root user
 USER 0
 
-### 'apt-get clean' runs automatically
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        chromium-browser \
-    && apt-get -y autoremove \
+### Install Google Chrome (not snap-based chromium-browser)
+RUN wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/keyrings/google-chrome.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-### Chromium browser requires some presets
+### Chromium/Chrome requires some presets
 ### Note that 'no-sandbox' flag is required, but intended for development only
 RUN echo "CHROMIUM_FLAGS='--no-sandbox --disable-gpu --user-data-dir --window-size=${VNC_RESOLUTION%x*},${VNC_RESOLUTION#*x} --window-position=0,0'" > ${HOME}/.chromium-browser.init
 
