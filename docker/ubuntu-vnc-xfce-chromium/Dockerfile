@@ -35,7 +35,7 @@ RUN apt-get update \
 RUN echo "CHROMIUM_FLAGS='--no-sandbox --disable-gpu --user-data-dir --window-size=${VNC_RESOLUTION%x*},${VNC_RESOLUTION#*x} --window-position=0,0'" > ${HOME}/.chromium-browser.init
 
 ### Install NordVPN
-RUN wget -qO - https://downloads.nordcdn.com/apps/linux/install.sh | bash \
+RUN wget -qO - https://downloads.nordcdn.com/apps/linux/install.sh | DEBIAN_FRONTEND=noninteractive bash \
     && rm -rf /var/lib/apt/lists/*
 
 ### Pre-create TUN device node directory
