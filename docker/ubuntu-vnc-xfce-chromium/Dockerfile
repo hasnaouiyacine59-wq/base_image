@@ -24,8 +24,8 @@ FROM accetto/ubuntu-vnc-xfce:${BASETAG} as stage-install
 USER 0
 
 ### Install Google Chrome (not snap-based chromium-browser)
-RUN wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/keyrings/google-chrome.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+RUN wget -qO- https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
